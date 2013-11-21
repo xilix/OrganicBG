@@ -1,0 +1,174 @@
+<html>
+  <head>
+    <title> Organic Backgrounds </title>
+    <script type="text/javascript" src="js/organicbg.js"></script>
+    <style>
+      .exemple {
+        border-radius: 5px;
+        border: 2px #327 solid;
+        background-color: #CED;
+        padding: 5px;
+        margin-left: 20px;
+        margin-top: 20px;
+      }
+      .info{
+        width: 250px;
+        float: left;
+        clear: none;
+      }
+      .code{
+        width: 250px;
+        float: left;
+        clear: none;
+        margin-left: 5px;
+        padding-left: 5px;
+        border-left: 1px dashed #BA9;
+      }
+      body {
+        font-style: verdana, arial, sans-serif;
+      }
+    </style>
+  </head>
+  <body style="text-align:center">
+
+  <h2>Organic Background</h2>
+    
+<div id="exemple1" style="border: 2px #000 solid; width:800px;height:640px; margin: auto; margin-top: 30px;background-repeat: no-repeat;">
+  <div class="exemple">
+    <div class="info">
+      <h3>Move behaviour</h3>
+      <p>Allows the particle to have any kind of movement</p>
+      <hr />
+      <h3>Keep inside behaviour</h3>
+      <p>
+        It keeps the particle inside an area.
+        It requires an area to keep inside and a way to keep inside.
+        viewport is the whole area of the background html element.
+        bounce it tells that the particle will bounce in the edge.
+        It may also be stop and update. update make the particle to update
+        it's state till it fits inside the area.</p>
+      <hr />
+      <h3>Random movment</h3>
+      <p>It randomly change the velocity of the particle.
+      It require a probablity "P" on how often it happens.
+      The probability it range from 0 (more probable) to 1 (sure it will happen).
+      This proability is check every click.
+      Also it need a maximum speed "v" which it will have the particle.</p>
+    </div>
+    <div class="code">
+    <pre>
+      var obgAnim1 = OBG.create({
+        "DNA": {
+          "spaceInv1": {
+            "behaviours": [
+            {"behaviour": "move"},
+            {"behaviour": "keepInside"    , "content": "viewport", "how": "bounce"}, 
+            {"behaviour": "randomMovment", "P": 0.98, "v": 3}
+            ],
+            "img": {
+              "src": "http://2.bp.blogspot.com/-ifFOGeLt_Ug/Uoe5IN-r91I/AAAAAAAAG4w/RkiDfpiOTTY/s1600/inv1.png",
+              "size": ["128px", "64px"]
+            }
+          }
+        },
+        "instances": [
+        {"pos": "50px 10px"	  , "DNA": "spaceInv1"},
+        ],
+        "content": document.getElementById("exemple"),
+        "limit": {"to": 12, "reach": "dontAdd"},
+        "fps": 30
+      });
+
+      obgAnim1.start();
+    </pre>
+     <script language='Javascript'>
+      //<![CDATA[
+
+      var obgAnim1 = OBG.create({
+        "DNA": {
+          "spaceInv1": {
+            "behaviours": [
+            {"behaviour": "move"},
+            {"behaviour": "keepInside"    , "content": "viewport", "how": "bounce"}, 
+            {"behaviour": "randomMovment", "P": 0.98, "v": 3}
+            ],
+            "img": {
+              "src": "http://2.bp.blogspot.com/-ifFOGeLt_Ug/Uoe5IN-r91I/AAAAAAAAG4w/RkiDfpiOTTY/s1600/inv1.png",
+              "size": ["128px", "64px"]
+            }
+          }
+        },
+        "instances": [
+        {"pos": "50px 10px"	  , "DNA": "spaceInv1"},
+        ],
+        "content": document.getElementById("exemple"),
+        "limit": {"to": 12, "reach": "dontAdd"},
+        "fps": 30
+      });
+
+      obgAnim1.start();
+
+      //]]>
+    </script>
+   </div>
+  </div>
+</div> 
+<script language='Javascript'>
+  //<![CDATA[
+
+  OBG.start({
+    "DNA": {
+      "spaceInv1": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside"    , "content": "viewport", "how": "bounce"}, 
+        {"behaviour": "randomMovment", "P": 0.98, "v": 3},
+        {"behaviour": "randomTeleoprt", "P": 0.995} 
+        ],
+        "img": {
+          "src": "http://2.bp.blogspot.com/-ifFOGeLt_Ug/Uoe5IN-r91I/AAAAAAAAG4w/RkiDfpiOTTY/s1600/inv1.png",
+          "size": ["128px", "64px"]
+        }
+      },
+      "spaceInv2": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside", "content": "viewport", "how": "update"}, 
+        {"behaviour": "randomMovment", "P": 0.95, "v": 5},
+        {"behaviour": "eject"        , "P": 0.995, "DNA": "smoke1"}
+        ],
+        "img": {
+          "src": "http://3.bp.blogspot.com/-CDTN06xLfn4/Uoe5IIaaqCI/AAAAAAAAG4s/YUaWU930e80/s1600/inv2.png",
+          "size": ["52px", "34px"]
+        }
+      },
+      "smoke1": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside"      , "content": "viewport", "how": "stop"}, 
+        {"behaviour": "randomWalker"    , "P": 0.8, "d": 2},
+        {"behaviour": "die"             , "P": 0.999}
+        ],
+        "img": {
+          "src": "http://1.bp.blogspot.com/-ppY0TzCnsTU/UouvyveV9hI/AAAAAAAAG6Y/UcT0TfLsje8/s1600/polvo1.png",
+          "size": ["16px", "16px"]
+        }
+      }
+    },
+    "instances": [
+    {"pos": "50px 10px"	  , "DNA": "spaceInv1"},
+    {"pos": "950px 50px"	, "DNA": "spaceInv1"},
+    {"pos": "450px 70px"	, "DNA": "spaceInv2"},
+    {"pos": "150px 10px"	, "DNA": "spaceInv2"},
+    {"pos": "750px 30px"	, "DNA": "spaceInv2"},
+    {"pos": "650px 150px"	, "DNA": "spaceInv2"}	
+    ],
+    "content": document.getElementById("header-inner"),
+    "limit": {"to": 12, "reach": "dontAdd"},
+    "fps": 30
+  });
+
+  //]]>
+</script>
+</body>
+</html>
