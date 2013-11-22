@@ -396,50 +396,110 @@
       "spaceInv1": {
         "behaviours": [
         {"behaviour": "move"},
-        {"behaviour": "keepInside"    , "content": "viewport", "how": "bounce"}, 
-        {"behaviour": "randomMovment", "P": 0.98, "v": 3},
-        {"behaviour": "randomTeleoprt", "P": 0.995} 
+        {"behaviour": "keepInside"    , "content": "viewport", "how": "update"}, 
+        {"behaviour": "randomMovment", "P": 0.98, "v": 2},
+        {"behaviour": "randomTeleoprt", "P": 0.995},
+        {"behaviour": "eject"        , "P": 0.995, "DNA": "spark1"}
         ],
         "img": {
-          "src": "http://2.bp.blogspot.com/-ifFOGeLt_Ug/Uoe5IN-r91I/AAAAAAAAG4w/RkiDfpiOTTY/s1600/inv1.png",
-          "size": ["128px", "64px"]
+          "src": "http://2.bp.blogspot.com/-7MBIdqphISg/Uo0ab_jf10I/AAAAAAAAG-4/-1aMrnQ5eSY/s1600/inv1.png",
+          "size": ["64px", "36px"]
         }
       },
       "spaceInv2": {
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside", "content": "viewport", "how": "update"}, 
-        {"behaviour": "randomMovment", "P": 0.95, "v": 5},
-        {"behaviour": "eject"        , "P": 0.995, "DNA": "smoke1"}
+        {"behaviour": "randomMovment", "P": 0.95, "v": 3},
+        {"behaviour": "randomTeleoprt", "P": 0.998}, 
+        {"behaviour": "eject"        , "P": 0.995, "DNA": "spark2"}
         ],
         "img": {
-          "src": "http://3.bp.blogspot.com/-CDTN06xLfn4/Uoe5IIaaqCI/AAAAAAAAG4s/YUaWU930e80/s1600/inv2.png",
+          "src": "http://1.bp.blogspot.com/-L5UUPVb63aw/Uo0ab3bNoGI/AAAAAAAAG_Q/HpfID1_iq6M/s1600/inv2.png",
+          "size": ["64px", "36px"]
+        }
+      },
+      "spaceInv3": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside", "content": "viewport", "how": "bounce"}, 
+        {"behaviour": "randomMovment", "P": 0.95, "v": 4},
+        {"behaviour": "eject"        , "P": 0.995, "DNA": "spark3"}
+        ],
+        "img": {
+          "src": "http://2.bp.blogspot.com/-U7ml0yJf7A4/Uo0ab5YhI0I/AAAAAAAAG-8/wAu8EDHx_QQ/s1600/inv3.png",
           "size": ["52px", "34px"]
         }
       },
-      "smoke1": {
+      "spaceInv4": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside", "content": "viewport", "how": "bounce"}, 
+        {"behaviour": "randomMovment", "P": 0.93, "v": 5},
+        {"behaviour": "eject"        , "P": 0.995, "DNA": "spark4"}
+        ],
+        "img": {
+          "src": "http://1.bp.blogspot.com/-sV8jc20lST0/Uo0acKf_QfI/AAAAAAAAG_A/bwpzPiEaA-s/s1600/inv4.png",
+          "size": ["52px", "34px"]
+        }
+      },
+      "spark1": {
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside"      , "content": "viewport", "how": "stop"}, 
-        {"behaviour": "randomWalker"    , "P": 0.8, "d": 2},
         {"behaviour": "die"             , "P": 0.999}
         ],
         "img": {
-          "src": "http://1.bp.blogspot.com/-ppY0TzCnsTU/UouvyveV9hI/AAAAAAAAG6Y/UcT0TfLsje8/s1600/polvo1.png",
+          "src": "http://1.bp.blogspot.com/-Z0vWxEHTg6w/Uo1HIbYJ1qI/AAAAAAAAHBA/Vn6ja9fOKkc/s1600/dot1.png",
+          "size": ["16px", "16px"]
+        }
+      },
+      "spark2": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside"      , "content": "viewport", "how": "stop"}, 
+        {"behaviour": "die"             , "P": 0.999}
+        ],
+        "img": {
+          "src": "http://1.bp.blogspot.com/-r5ImJdKKw9E/Uo1HIUdmR3I/AAAAAAAAHBE/dvZW8BpA8Kk/s1600/dot2.png",
+          "size": ["16px", "16px"]
+        }
+      },
+      "spark3": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside"      , "content": "viewport", "how": "stop"}, 
+        {"behaviour": "die"             , "P": 0.999}
+        ],
+        "img": {
+          "src": "http://1.bp.blogspot.com/-iqxePNxt2Tw/Uo1HIVYjIdI/AAAAAAAAHBI/bvH9a8Og2W8/s1600/dot3.png",
+          "size": ["16px", "16px"]
+        }
+      },
+      "spark4": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside"      , "content": "viewport", "how": "stop"}, 
+        {"behaviour": "die"             , "P": 0.999}
+        ],
+        "img": {
+          "src": "http://1.bp.blogspot.com/-iM9V9EV4iq4/Uo1HIzuEZeI/AAAAAAAAHBU/3CBX9pcpxC0/s1600/dot4.png",
           "size": ["16px", "16px"]
         }
       }
     },
     "instances": [
-    {"pos": "50px 10px"	  , "DNA": "spaceInv1"},
+    {"pos": "50px 100px"    , "DNA": "spaceInv1"},
     {"pos": "950px 50px"	, "DNA": "spaceInv1"},
     {"pos": "450px 70px"	, "DNA": "spaceInv2"},
     {"pos": "150px 10px"	, "DNA": "spaceInv2"},
-    {"pos": "750px 30px"	, "DNA": "spaceInv2"},
-    {"pos": "650px 150px"	, "DNA": "spaceInv2"}	
+    {"pos": "700px 30px"	, "DNA": "spaceInv3"},
+    {"pos": "170px 50px"	, "DNA": "spaceInv3"},
+    {"pos": "750px 30px"	, "DNA": "spaceInv4"},
+    {"pos": "650px 150px"	, "DNA": "spaceInv4"}	
     ],
     "content": document.getElementById("header-inner"),
-    "limit": {"to": 12, "reach": "dontAdd"},
+    "limit": {"to": 20, "reach": "dontAdd"},
     "fps": 30
   });
 
