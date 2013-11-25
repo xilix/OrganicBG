@@ -61,55 +61,6 @@ var OBG = (function (OBG) {
     }
 
     /**
-    * Asemble the keep inside behaviour
-    */
-    function assembleKeepInside (particle, inject) {
-      var limits = [999, 999], how = function () { };
-
-      if (inject.content === "viewport") {
-        limits = [inject.W, inject.H];
-        limits[0] -= particle.size[0];
-        limits[1] -= particle.size[1];
-      }
-
-      switch (inject.how) {
-        case "stop":
-          how = function (inject) {
-            particle.pos = inject.pos;
-            particle.v = [0, 0];
-          };
-          break;
-        case "update":
-          how = function (inject) {
-            particle.pos = inject.pos;
-            particle.update();
-          };
-        case "bounce":
-          how = function (inject) {
-            particle.pos = inject.pos;
-            if (inject.hit[0]) { particle.v[0] = -particle.v[0]; }
-            if (inject.hit[1]) { particle.v[1] = -particle.v[1]; }
-          };
-          break;
-      }
-
-      particle.addBehaviour(function () {
-        var isInside = true, limit = {"pos": particle.pos, "hit": [false, false]};
-        if (particle.pos[0] > limits[0])  { limit.pos[0] = limits[0]; limit.hit[0] = true; isInside = false; }
-        if (particle.pos[1] > limits[1])  { limit.pos[1] = limits[1]; limit.hit[1] = true; isInside = false; }
-        if (particle.pos[0] < 0)          { limit.pos[0] = 0;         limit.hit[0] = true; isInside = false; }
-        if (particle.pos[1] < 0)          { limit.pos[1] = 0;         limit.hit[1] = true; isInside = false; }
-
-        if (!isInside) {
-          how(limit);
-        }
-
-      });
-
-      return particle;
-    }
-
-    /**
     * Particle factory
     */
     function PaticleFactory(inject) {
@@ -120,98 +71,8 @@ var OBG = (function (OBG) {
       particle = new BaseParticle(inject);
 
       for (i = 0; i < Nbehaviours; i += 1) {
-
         behaviour = inject.behaviours[i];
-        switch (behaviour.behaviour) {
-          case "move":// To allow position update with velocity
-            particle.addBehaviour(function(){
-              particle.pos[0] += particle.v[0];
-              particle.pos[1] += particle.v[1];
-            });
-            break;
-          case "keepInside":// Keep particle inside a box
-            var keepInside = behaviour;
-            keepInside.W = inject.W;
-            keepInside.H = inject.H;
-
-            particle = assembleKeepInside(particle, keepInside);
-            break;
-          case "randomMovment":// Random velocity update
-            var randomMovment = behaviour;
-            particle.addBehaviour(function(){
-              if (Math.random() > randomMovment.P) {
-                particle.v = [
-                  Math.round(randomMovment.v * Math.random() * (1 - Math.random() * 2)), 
-                  Math.round(randomMovment.v * Math.random() * (1 - Math.random() * 2))
-                ];
-              }
-            });
-            break;
-          case "randomTeleoprt":
-            var randomTeleoprt = behaviour;
-            particle.addBehaviour(function(){
-              if (Math.random() > randomTeleoprt.P) {
-                particle.pos = [
-                  Math.round(inject.W * Math.random()), 
-                  Math.round(inject.H * Math.random()) 
-                ];
-              }
-            });
-            break;
-          case "brownianMovment":
-            var brownianMovment = behaviour;
-            particle.addBehaviour(function(){
-              if (Math.random() > brownianMovment.P) {
-                particle.v = [
-                  particle.v[0] + Math.round(brownianMovment.v * Math.random() * (1 - Math.random() * 2)), 
-                  particle.v[1] + Math.round(brownianMovment.v * Math.random() * (1 - Math.random() * 2))
-                ];
-              }
-            });
-            break;
-          case "randomWalker":
-            var randomWalker = behaviour;
-            particle.addBehaviour(function(){
-              if (Math.random() > randomWalker.P) {
-                particle.pos = [
-                  particle.pos[0] + Math.round(randomWalker.d * Math.random() * (1 - Math.random() * 2)), 
-                  particle.pos[1] + Math.round(randomWalker.d * Math.random() * (1 - Math.random() * 2))
-                ];
-              }
-            });
-            break;
-          case "clone":
-            var clone = behaviour;
-            particle.addBehaviour(function(){
-              if (Math.random() > clone.P) {
-                particlesBuffer.prepareKid(particle.DNA);
-              }
-            });
-            break;
-          case "eject":
-            var eject = behaviour;
-            particle.addBehaviour(function(){
-              if (Math.random() > eject.P) {
-                particlesBuffer.prepareKid(createDNA(
-                  eject["DNA"], 
-                  {"pos": [
-                    particle.pos[0] + Math.round(particle.size[0] / 3), 
-                    particle.pos[1] + Math.round(particle.size[1] / 3)
-                    ]}
-                ));
-              }
-            });
-            break;
-          case "die":
-            var die = behaviour;
-            particle.addBehaviour(function(){
-              if (Math.random() > die.P) {
-                particlesBuffer.deathMark(particle.index);
-              }
-            });
-            break;
-        }
-
+        OBG.assemblers[behaviour.behaviour](particle, behaviour, inject); 
       }
 
       particle.index = inject.index
@@ -388,3 +249,143 @@ var OBG = (function (OBG) {
   return OBG;
 })(OBG || {});
 
+OBG = (function (OBG) {
+  OBG.assemblers = [];
+  /**
+  * Asemble the keep inside behaviour
+  */
+  OBG.assemblers["keepInside"] = function (particle, behaviour, inject) {
+    var limits = [999, 999], how = function () { };
+
+    behaviour.W = inject.W;
+    behaviour.H = inject.H;
+
+    if (behaviour.content === "viewport") {
+      limits = [behaviour.W, behaviour.H];
+      limits[0] -= particle.size[0];
+      limits[1] -= particle.size[1];
+    }
+
+    switch (behaviour.how) {
+      case "stop":
+        how = function (behaviour) {
+          particle.pos = behaviour.pos;
+          particle.v = [0, 0];
+        };
+        break;
+      case "update":
+        how = function (behaviour) {
+          particle.pos = behaviour.pos;
+          particle.update();
+        };
+      case "bounce":
+        how = function (behaviour) {
+          particle.pos = behaviour.pos;
+          if (behaviour.hit[0]) { particle.v[0] = -particle.v[0]; }
+          if (behaviour.hit[1]) { particle.v[1] = -particle.v[1]; }
+        };
+        break;
+    }
+
+    particle.addBehaviour(function () {
+      var isInside = true, limit = {"pos": particle.pos, "hit": [false, false]};
+      if (particle.pos[0] > limits[0])  { limit.pos[0] = limits[0]; limit.hit[0] = true; isInside = false; }
+      if (particle.pos[1] > limits[1])  { limit.pos[1] = limits[1]; limit.hit[1] = true; isInside = false; }
+      if (particle.pos[0] < 0)          { limit.pos[0] = 0;         limit.hit[0] = true; isInside = false; }
+      if (particle.pos[1] < 0)          { limit.pos[1] = 0;         limit.hit[1] = true; isInside = false; }
+
+      if (!isInside) {
+        how(limit);
+      }
+
+    });
+    return particle;
+  };
+  OBG.assemblers["move"] = function (particle, behaviour, inject) {
+    particle.addBehaviour(function(){
+      particle.pos[0] += particle.v[0];
+      particle.pos[1] += particle.v[1];
+    });
+    return particle;
+  };
+  OBG.assemblers["randomMovment"] = function (particle, behaviour, inject) {
+    particle.addBehaviour(function(){
+      if (Math.random() > behaviour.P) {
+        particle.v = [
+          Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2)), 
+          Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2))
+        ];
+      }
+    });
+    return particle;
+  };
+  OBG.assemblers["randomTeleport"] = function (particle, behaviour, inject) {
+    particle.addBehaviour(function(){
+      if (Math.random() > behaviour.P) {
+        particle.pos = [
+          Math.round(inject.W * Math.random()), 
+          Math.round(inject.H * Math.random()) 
+        ];
+      }
+    });
+    return particle;
+  };
+  OBG.assemblers["brownianMovment"] = function (particle, behaviour, inject) {
+    particle.addBehaviour(function(){
+      if (Math.random() > behaviour.P) {
+        particle.v = [
+          particle.v[0] + Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2)), 
+          particle.v[1] + Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2))
+        ];
+      }
+    });
+    return particle;
+  };
+  OBG.assemblers["randomWalker"] = function (particle, behaviour, inject) {
+    particle.addBehaviour(function(){
+      if (Math.random() > behaviour.P) {
+        particle.pos = [
+          particle.pos[0] + Math.round(behaviour.d * Math.random() * (1 - Math.random() * 2)), 
+          particle.pos[1] + Math.round(behaviour.d * Math.random() * (1 - Math.random() * 2))
+        ];
+      }
+    });
+    return particle;
+  };
+  OBG.assemblers["clone"] = function (particle, behaviour, inject) {
+    particle.addBehaviour(function(){
+      if (Math.random() > behaviour.P) {
+        particlesBuffer.prepareKid(particle.DNA);
+      }
+    });
+    return particle;
+  };
+  OBG.assemblers["eject"] = function (particle, behaviour, inject) {
+    particle.addBehaviour(function(){
+      if (Math.random() > behaviour.P) {
+        particlesBuffer.prepareKid(createDNA(
+          behaviour["DNA"], 
+          {"pos": [
+            particle.pos[0] + Math.round(particle.size[0] / 3), 
+            particle.pos[1] + Math.round(particle.size[1] / 3)
+            ]}
+        ));
+      }
+    });
+    return particle;
+  };
+  OBG.assemblers["die"] = function (particle, behaviour, inject) {
+    particle.addBehaviour(function(){
+      if (Math.random() > behaviour.P) {
+        particlesBuffer.deathMark(particle.index);
+      }
+    });
+    return particle;
+  };
+  OBG.assemblers["dummy"] = function (particle, behaviour, inject) {
+
+    return particle;
+  };
+
+  return OBG;
+})(OBG);
