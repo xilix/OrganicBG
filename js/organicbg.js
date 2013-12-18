@@ -11,209 +11,196 @@ var OBG = (function (OBG) {
 
   var quickLaunch = null;
 
+  OBG.bases = [];
+
+  /**
+   * Base class for partcile
+   */
+  OBG.bases.Particle = function (lambda) {
+    var i = 0, Nbehaviours = 0 // For performance
+    ,   behaviours = [];// behabiours clousures
+
+    this.v = [0, 0];// Velocity
+    this.pos = lambda.pos;// Initial pos
+    this.img = lambda.img;
+    this.DNA = lambda;// for cloning
+    this.size = [
+      parseInt(lambda.img.size[0].split("px")[0]),
+      parseInt(lambda.img.size[1].split("px")[0])
+    ];
+
+    this.addBehaviour = function (behaviour) {
+      behaviours.push(behaviour);
+      Nbehaviours += 1;
+    };
+
+    this.getBehaviours = function () { return behaviours; };
+
+    this.update = function () { 
+      for (i = 0; i < Nbehaviours; i++) {
+        behaviours[i]();
+      }
+    };
+    this.getPos = function () {
+      return this.pos[0]+"px "+this.pos[1]+"px";
+    };
+    this.getImg = function () {
+      return "url("+this.img.src+")";
+    };      
+    this.loop = function () {
+      this.update();
+    };
+  };
+
+  /**
+  * Particle factory
+  */
+  OBG.PaticleFactory = function (lambda) {
+    var particle, i
+    ,   Nbehaviours = lambda.behaviours.length;
+
+    particle = new OBG.bases[lambda.base](lambda);
+
+    for (i = 0; i < Nbehaviours; i += 1) {
+      OBG.assemblers[lambda.behaviours[i].behaviour](particle, lambda.behaviours[i], lambda); 
+    }
+
+    particle.index = lambda.index
+
+    return particle;
+  };
+
+  OBG.DNA = function (settings) {
+    this.settings = settings;
+
+    this.create = function (baseDNA, mutate) {
+      var DNA = this.settings.DNA[baseDNA], gen;
+
+      for (gen in mutate) {
+        DNA[gen] = mutate[gen];
+      }
+
+      return DNA;
+    };
+  };
+
+  // Bases buffer
+  function BaseBuffer(lambda) {
+    this.limit = lambda.to;
+    this.limitReach = lambda.reach;
+    this.length = 0;
+    this.data = [];
+    this.pregnants = [];
+    this.deathMarks = [];
+  }
+  BaseBuffer.prototype.clear = function () {
+    this.length = 0;
+    this.paricles = [];
+    this.pregnants = [];
+    this.deathMarks = [];
+
+    return this;
+  };
+  BaseBuffer.prototype.add = function (lambda, now) {
+    if (now === undefined || !now) {
+      this.prepareKid(index); return this;
+    }
+
+    if (this.length > this.limit) {
+      switch (this.limitReach) {
+        case "clear":
+          this.clear();
+          break;
+        case "dontAdd":
+          break;
+      }
+      return null;
+    }
+
+    lambda.index = this.data.length;
+    lambda.basesBuffer = this;
+    this.data.push(new OBG.PaticleFactory(lambda));  
+    this.length += 1;
+
+    return this.data[this.length - 1];
+  };
+  BaseBuffer.prototype.prepareKid = function (index) {
+    this.pregnants.push(index);
+  };
+  BaseBuffer.prototype.giveBirthToAll = function () {
+    var i, N = this.pregnants.length;
+
+    for(i = 0; i < N; i += 1) {
+      this.add(this.pregnants[i], true);
+    }
+    this.pregnants = [];
+  };
+  BaseBuffer.prototype.deathMark = function (index) {
+    this.deathMarks.push(index);
+  };
+  BaseBuffer.prototype.executeDeathMarks = function () {
+    var i, N = this.deathMarks.length;
+
+    for(i = 0; i < N; i += 1) {
+      this.remove(this.deathMarks[i], true);
+    }
+    this.deathMarks = [];
+  };
+  BaseBuffer.prototype.remove = function (index, now) {
+    var Ndata = this.data.length, i;
+
+    if (now === undefined || !now) {
+      this.deathMark(index); return this;
+    }
+
+    // update the data index as the buffer have change
+    for (i = index; i < Ndata; i++ ) { 
+      this.data[i].index -= 1; 
+    }
+    this.data.splice(index,1);
+    this.length -= 1;
+
+    return this;
+  };
+
+
   function OrganicBG(settings) 
   {
-    var particlesBuffer
-    ,   particles
-    ,   content = settings.content;
+    var particles
+    ,   content = settings.content
+    ,   basesBuffer = null
+    ,   bases = null;
 
+    this.settings = settings;
     this.animId = null;
+    this.DNA = null;
+    this.basesBuffer = new BaseBuffer(settings.limit);
 
-    /**
-    * Base class for partcile
-    */
-    function BaseParticle(inject)
-    {
-      var i = 0, Nbehaviours = 0 // For performance
-      ,   behaviours = [];// behabiours clousures
+    basesBuffer = this.basesBuffer;
+    bases = this.basesBuffer.data;// beacuse performance
 
-      this.v = [0, 0];// Velocity
-      this.pos = inject.pos;// Initial pos
-      this.img = inject.img;
-      this.DNA = inject;// for cloning
-      this.size = [
-        parseInt(inject.img.size[0].split("px")[0]),
-        parseInt(inject.img.size[1].split("px")[0])
-      ];
-
-      this.addBehaviour = function (behaviour) {
-        behaviours.push(behaviour);
-        Nbehaviours += 1;
-      };
-
-      this.getBehaviours = function () { return behaviours; }
-
-      this.update = function () { 
-        for (i = 0; i < Nbehaviours; i++) {
-          behaviours[i]();
-        }
-      };
-      this.getPos = function () {
-        return this.pos[0]+"px "+this.pos[1]+"px";
-      };
-      this.getImg = function () {
-        return "url("+this.img.src+")";
-      };      
-      this.loop = function () {
-        this.update();
-      };
-
-    }
-
-    /**
-    * Particle factory
-    */
-    function PaticleFactory(inject) {
-      var particle, i
-      ,   Nbehaviours = inject.behaviours.length
-      ,   behaviour;
-
-      particle = new BaseParticle(inject);
-
-      for (i = 0; i < Nbehaviours; i += 1) {
-        behaviour = inject.behaviours[i];
-        OBG.assemblers[behaviour.behaviour](particle, behaviour, inject); 
-      }
-
-      particle.index = inject.index
-
-      return particle;
-
-    }
-
-    // Particles buffer
-    function ParticlesBuffer(inject) {
-      this.limit = inject.to;
-      this.limitReach = inject.reach;
-      this.length = 0;
-      this.particles = [];
-      this.pregnants = [];
-      this.deathMarks = [];
-    }
-    ParticlesBuffer.prototype.clear = function () {
-      this.length = 0;
-      this.paricles = [];
-      this.pregnants = [];
-      this.deathMarks = [];
-
-      return this;
-    };
-    ParticlesBuffer.prototype.add = function (inject, now) {
-      if (now === undefined || !now) {
-        this.prepareKid(index); return this;
-      }
-
-
-      if (this.length > this.limit) {
-        switch (this.limitReach) {
-          case "clear":
-            this.clear();
-            break;
-          case "dontAdd":
-            break;
-        }
-        return null;
-      }
-
-      inject.index = this.particles.length;
-      this.particles.push(new PaticleFactory(inject));  
-      this.length += 1;
-
-      return this.particles[this.length - 1];
-    };
-    ParticlesBuffer.prototype.prepareKid = function (index) {
-      this.pregnants.push(index);
-    };
-    ParticlesBuffer.prototype.giveBirthToAll = function () {
-      var i, N = this.pregnants.length;
-
-      for(i = 0; i < N; i += 1) {
-        this.add(this.pregnants[i], true);
-      }
-      this.pregnants = [];
-    };
-    ParticlesBuffer.prototype.deathMark = function (index) {
-      this.deathMarks.push(index);
-    };
-    ParticlesBuffer.prototype.executeDeathMarks = function () {
-      var i, N = this.deathMarks.length;
-
-      for(i = 0; i < N; i += 1) {
-        this.remove(this.deathMarks[i], true);
-      }
-      this.deathMarks = [];
-    };
-    ParticlesBuffer.prototype.remove = function (index, now) {
-      var Nparticles = this.particles.length, i;
-
-      if (now === undefined || !now) {
-        this.deathMark(index); return this;
-      }
-
-      // update the particles index as the buffer have change
-      for (i = index; i < Nparticles; i++ ) { 
-        this.particles[i].index -= 1; 
-      }
-      this.particles.splice(index,1);
-      this.length -= 1;
-
-      return this;
-    };
-    particlesBuffer = new ParticlesBuffer(settings.limit);
-    particles = particlesBuffer.particles;// beacuse performance
-
-    function createDNA(baseDNA, mutate) {
-      var DNA = settings["DNA"][baseDNA];
-
-      DNA.W = parseInt(content.style.width.split("px")[0]);
-      DNA.H = parseInt(content.style.height.split("px")[0]);
-      DNA.pos = mutate.pos;
-
-      return DNA
-    }
-
-    this.setContent = function (value) {
-      content = value;
-      particlesBuffer.clear();
-    };
-
+    // Here for perfomance
     this.loop = function () {
       var i, N
       ,   backStyle = ""
       ,   backImg = "";
 
-      N = particles.length;
+      N = bases.length;
       for (i = 0; i < N; i++) {
-        particles[i].loop();
-        backStyle += particles[i].getPos() + ",";
-        backImg   += particles[i].getImg() + ",";
+        bases[i].loop();
+        backStyle += bases[i].getPos() + ",";
+        backImg   += bases[i].getImg() + ",";
       }
 
-      particlesBuffer.executeDeathMarks();
-      particlesBuffer.giveBirthToAll();
+      basesBuffer.executeDeathMarks();
+      basesBuffer.giveBirthToAll();
       content.style.backgroundImage = backImg.slice(0, - 1);
       content.style.backgroundPosition = backStyle.slice(0, - 1);
-    }
+    };
 
-    this.start = function () {
-      var loop = this.loop, id;
-      id  = setInterval(function() {
-        try {
-          loop();
-        } catch (e) {
-          this.stop();
-          throw e;
-        }
-      }, Math.round(1000 / settings.fps));
-      this.animId = id;
-    }
-
-    this.stop = function () {
-      window.clearInterval(this.animId);
-    }
-
-    function __construct() {
+    function __construct(parent) {
       var initPos = [], Nparticles, i;
+      parent.DNA = new OBG.DNA(settings);
 
       Nparticles = settings.instances.length;
       for (i = 0; i < Nparticles; i++) {
@@ -222,14 +209,42 @@ var OBG = (function (OBG) {
         initPos[1] = settings.instances[i].pos.split("px ")[1];
         initPos[1] = parseInt(initPos[1].split("px ")[0]);
 
-        particlesBuffer.add(
-          createDNA(settings.instances[i]["DNA"], {"pos": initPos}), true
+        parent.basesBuffer.add(
+          parent.DNA.create(settings.instances[i].DNA, {
+            "W": parseInt(settings.content.style.width.split("px")[0]),
+            "H": parseInt(settings.content.style.height.split("px")[0]),
+            "pos": initPos
+          }), true
         );
       }
-
     }
-    __construct();
+    __construct(this);
+
+  }
+
+  OrganicBG.prototype.setContent = function (value) {
+    content = value;
+    this.basesBuffer.clear();
   };
+
+
+  OrganicBG.prototype.start = function () {
+    var loop = this.loop, id;
+    id  = setInterval(function () {
+      try {
+        loop();
+      } catch (e) {
+        this.stop();
+        throw e;
+      }
+    }, Math.round(1000 / this.settings.fps));
+    this.animId = id;
+  };
+
+  OrganicBG.prototype.stop = function () {
+    window.clearInterval(this.animId);
+  };
+
 
   OBG.create = function (settings) {
     return new OrganicBG(settings);
@@ -254,11 +269,11 @@ OBG = (function (OBG) {
   /**
   * Asemble the keep inside behaviour
   */
-  OBG.assemblers["keepInside"] = function (particle, behaviour, inject) {
+  OBG.assemblers["keepInside"] = function (particle, behaviour, lambda) {
     var limits = [999, 999], how = function () { };
 
-    behaviour.W = inject.W;
-    behaviour.H = inject.H;
+    behaviour.W = lambda.W;
+    behaviour.H = lambda.H;
 
     if (behaviour.content === "viewport") {
       limits = [behaviour.W, behaviour.H];
@@ -278,6 +293,7 @@ OBG = (function (OBG) {
           particle.pos = behaviour.pos;
           particle.update();
         };
+        break;
       case "bounce":
         how = function (behaviour) {
           particle.pos = behaviour.pos;
@@ -301,15 +317,15 @@ OBG = (function (OBG) {
     });
     return particle;
   };
-  OBG.assemblers["move"] = function (particle, behaviour, inject) {
-    particle.addBehaviour(function(){
+  OBG.assemblers["move"] = function (particle, behaviour, lambda) {
+    particle.addBehaviour(function (){
       particle.pos[0] += particle.v[0];
       particle.pos[1] += particle.v[1];
     });
     return particle;
   };
-  OBG.assemblers["randomMovment"] = function (particle, behaviour, inject) {
-    particle.addBehaviour(function(){
+  OBG.assemblers["randomMovment"] = function (particle, behaviour, lambda) {
+    particle.addBehaviour(function (){
       if (Math.random() > behaviour.P) {
         particle.v = [
           Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2)), 
@@ -319,18 +335,18 @@ OBG = (function (OBG) {
     });
     return particle;
   };
-  OBG.assemblers["randomTeleport"] = function (particle, behaviour, inject) {
-    particle.addBehaviour(function(){
+  OBG.assemblers["randomTeleport"] = function (particle, behaviour, lambda) {
+    particle.addBehaviour(function (){
       if (Math.random() > behaviour.P) {
         particle.pos = [
-          Math.round(inject.W * Math.random()), 
-          Math.round(inject.H * Math.random()) 
+          Math.round(lambda.W * Math.random()), 
+          Math.round(lambda.H * Math.random()) 
         ];
       }
     });
     return particle;
   };
-  OBG.assemblers["brownianMovment"] = function (particle, behaviour, inject) {
+  OBG.assemblers["brownianMovment"] = function (particle, behaviour, lambda) {
     particle.addBehaviour(function(){
       if (Math.random() > behaviour.P) {
         particle.v = [
@@ -341,7 +357,7 @@ OBG = (function (OBG) {
     });
     return particle;
   };
-  OBG.assemblers["randomWalker"] = function (particle, behaviour, inject) {
+  OBG.assemblers["randomWalker"] = function (particle, behaviour, lambda) {
     particle.addBehaviour(function(){
       if (Math.random() > behaviour.P) {
         particle.pos = [
@@ -352,18 +368,18 @@ OBG = (function (OBG) {
     });
     return particle;
   };
-  OBG.assemblers["clone"] = function (particle, behaviour, inject) {
+  OBG.assemblers["clone"] = function (particle, behaviour, lambda) {
     particle.addBehaviour(function(){
       if (Math.random() > behaviour.P) {
-        particlesBuffer.prepareKid(particle.DNA);
+        lambda.basesBuffer.prepareKid(particle.DNA);
       }
     });
     return particle;
   };
-  OBG.assemblers["eject"] = function (particle, behaviour, inject) {
+  OBG.assemblers["eject"] = function (particle, behaviour, lambda) {
     particle.addBehaviour(function(){
       if (Math.random() > behaviour.P) {
-        particlesBuffer.prepareKid(createDNA(
+        lambda.basesBuffer.prepareKid(createDNA(
           behaviour["DNA"], 
           {"pos": [
             particle.pos[0] + Math.round(particle.size[0] / 3), 
@@ -374,18 +390,24 @@ OBG = (function (OBG) {
     });
     return particle;
   };
-  OBG.assemblers["die"] = function (particle, behaviour, inject) {
+  OBG.assemblers["die"] = function (particle, behaviour, lambda) {
     particle.addBehaviour(function(){
       if (Math.random() > behaviour.P) {
-        particlesBuffer.deathMark(particle.index);
+        lambda.basesBuffer.deathMark(particle.index);
       }
     });
     return particle;
   };
-  OBG.assemblers["dummy"] = function (particle, behaviour, inject) {
+  OBG.assemblers["dummy"] = function (particle, behaviour, lambda) {
 
     return particle;
   };
 
   return OBG;
 })(OBG);
+
+
+// Support CommonJS require()
+if (typeof module !== "undefined" && ('exports' in module)) { 
+  module.exports = OBG;
+}
