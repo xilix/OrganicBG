@@ -120,9 +120,14 @@ Allows the particle to have any kind of movement
 It keeps the particle inside an area. It requires an area to keep inside and a way to keep inside. viewport is the whole area of the background html element. bounce it tells that the particle will bounce in the edge. It may also be stop and update. update make the particle to update it's state till it fits inside the area.
 
 content: ["viewport"]
+viewport is to talk about the boundry of the DOM element. The particle with fetch inside of this area.
+
 how: ["stop" | "bounce" | "die"]
+  
   stop: stops the particle and put it on the closed boundry of the DOM element
+
   bounce: it flips the speed of the particle to bounce in the oposite direction of the closer boundry
+  
   die: just make the particle to die and disaper
 
 **randomMovment**
@@ -131,6 +136,7 @@ It randomly change the velocity of the particle. It require a probablity "P" on 
 
 v: [numeric]
 An array for the x and y direccion. Maxmium random speed in any direccion
+
 P: [numeric]
 Probability to change the direccion and the speed of the movment as (1-P)
 
@@ -147,6 +153,7 @@ Browniand movment adds a random modification to the speed of a particle.
 
 v: [numeric]
 An array for the x and y direccion. Maxmium random speed modification in any direccion
+
 P: [numeric]
 Probability to add a random movment to the direccion and the speed of the movment as (1-P)
 
