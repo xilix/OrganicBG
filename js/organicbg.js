@@ -37,6 +37,7 @@ var OBG = (function (OBG) {
     this.getBehaviours = function () { return behaviours; };
 
     this.update = function () { 
+      var i;
       for (i = 0; i < Nbehaviours; i++) {
         behaviours[i]();
       }
@@ -125,6 +126,7 @@ var OBG = (function (OBG) {
     return this.data[this.length - 1];
   };
   BaseBuffer.prototype.prepareKid = function (index) {
+console.log("preparing kid....");
     this.pregnants.push(index);
   };
   BaseBuffer.prototype.giveBirthToAll = function () {
@@ -132,6 +134,7 @@ var OBG = (function (OBG) {
 
     for(i = 0; i < N; i += 1) {
       this.add(this.pregnants[i], true);
+console.log("kid borned....");
     }
     this.pregnants = [];
   };
@@ -179,6 +182,20 @@ var OBG = (function (OBG) {
     basesBuffer = this.basesBuffer;
     bases = this.basesBuffer.data;// beacuse performance
 
+    this.mutagen = function (mutate) {
+      var mutagen = {
+        "DNA": this.DNA,
+        "mutagen": this.mutagen,
+        "W": parseInt(settings.content.style.width.split("px")[0]),
+        "H": parseInt(settings.content.style.height.split("px")[0])
+      }, gen;
+
+      for (gen in mutate) {
+        mutagen[gen] = mutate[gen];
+      }
+      return mutagen;
+    };
+
     // Here for perfomance
     this.loop = function () {
       var i, N
@@ -210,11 +227,11 @@ var OBG = (function (OBG) {
         initPos[1] = parseInt(initPos[1].split("px ")[0]);
 
         parent.basesBuffer.add(
-          parent.DNA.create(settings.instances[i].DNA, {
-            "W": parseInt(settings.content.style.width.split("px")[0]),
-            "H": parseInt(settings.content.style.height.split("px")[0]),
-            "pos": initPos
-          }), true
+          parent.DNA.create(
+            settings.instances[i].DNA 
+            , parent.mutagen({"pos": initPos})
+          )
+          , true
         );
       }
     }
@@ -291,7 +308,8 @@ OBG = (function (OBG) {
       case "update":
         how = function (behaviour) {
           particle.pos = behaviour.pos;
-          particle.update();
+          // diabled due to posible infinity inhritance. Too dangerous
+          //particle.update();
         };
         break;
       case "bounce":
@@ -301,6 +319,10 @@ OBG = (function (OBG) {
           if (behaviour.hit[1]) { particle.v[1] = -particle.v[1]; }
         };
         break;
+      case "die":
+        how = function (behaviour) {
+          lambda.basesBuffer.deathMark(particle.index);
+        };
     }
 
     particle.addBehaviour(function () {
@@ -379,12 +401,13 @@ OBG = (function (OBG) {
   OBG.assemblers["eject"] = function (particle, behaviour, lambda) {
     particle.addBehaviour(function(){
       if (Math.random() > behaviour.P) {
-        lambda.basesBuffer.prepareKid(createDNA(
+        lambda.basesBuffer.prepareKid(lambda.DNA.create(
           behaviour["DNA"], 
-          {"pos": [
-            particle.pos[0] + Math.round(particle.size[0] / 3), 
-            particle.pos[1] + Math.round(particle.size[1] / 3)
-            ]}
+          lambda.mutagen({
+            "pos":[
+              particle.pos[0] + Math.round(particle.size[0] / 2), 
+              particle.pos[1] + Math.round(particle.size[1] / 2)
+          ]})
         ));
       }
     });
@@ -398,6 +421,35 @@ OBG = (function (OBG) {
     });
     return particle;
   };
+  OBG.assemblers["fall"] = function (particle, behaviour, lambda) {
+    particle.addBehaviour(function(){
+      particle.v[0] += behaviour.a[0];
+      particle.v[1] += behaviour.a[1];
+    });
+    return particle;
+  };
+  OBG.assemblers["randomFall"] = function (particle, behaviour, lambda) {
+    particle.addBehaviour(function(){
+      particle.v[0] += Math.random() * behaviour.a[0] - behaviour.offset[0];
+      particle.v[1] += Math.random() * behaviour.a[1] - behaviour.offset[1];
+    });
+    return particle;
+  };
+  OBG.assemblers["resistance"] = function (particle, behaviour, lambda) {
+    particle.addBehaviour(function(){
+      particle.v[0] *= (1 - behaviour.rho[0]);
+      particle.v[1] *= (1 - behaviour.rho[1]);
+    });
+    return particle;
+  };
+  OBG.assemblers["friction"] = function (particle, behaviour, lambda) {
+    particle.addBehaviour(function(){
+      particle.v[0] *= behaviour.rho[1];
+      particle.v[1] *= behaviour.rho[0];
+    });
+    return particle;
+  };
+ 
   OBG.assemblers["dummy"] = function (particle, behaviour, lambda) {
 
     return particle;

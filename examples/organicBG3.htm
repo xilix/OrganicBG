@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> Organic Backgrounds </title>
+    <script type="text/javascript" src="../js/organicbg.js"></script>
+  </head> 
+  <body style="text-align:center">
+<div id="header-inner" style="border: 2px #000 solid; width:1020px;height:400px; margin: auto; margin-top: 30px;background-repeat: no-repeat;">
+</div> 
+<script language='Javascript'>
+  //<![CDATA[
+
+  var example = {
+    "DNA": {
+      "spaceInv1": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside"    , "content": "viewport", "how": "bounce"}, 
+        {"behaviour": "randomMovment", "P": 0.98, "v": 2},
+        {"behaviour": "randomTeleport", "P": 0.995}
+        , {"behaviour": "eject"        , "P": 0.995, "DNA": "smoke"}
+        ],
+        "img": {
+          "src": "http://2.bp.blogspot.com/-7MBIdqphISg/Uo0ab_jf10I/AAAAAAAAG-4/-1aMrnQ5eSY/s1600/inv1.png",
+          "size": ["64px", "36px"]
+        },
+        "base": "Particle"
+      },
+      "spaceInv2": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside", "content": "viewport", "how": "bounce"}, 
+        {"behaviour": "randomMovment", "P": 0.93, "v": 5}
+        , {"behaviour": "eject"        , "P": 0.995, "DNA": "spark"}
+        ],
+        "img": {
+          "src": "http://1.bp.blogspot.com/-sV8jc20lST0/Uo0acKf_QfI/AAAAAAAAG_A/bwpzPiEaA-s/s1600/inv4.png",
+          "size": ["52px", "34px"]
+        },
+        "base": "Particle"
+      },
+      "spark": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside"      , "content": "viewport", "how": "die"}, 
+        {"behaviour": "fall"  , "a": [0, 0.5],  "offset": [0, 0.15]},
+        ],
+        "img": {
+          "src": "http://1.bp.blogspot.com/-Z0vWxEHTg6w/Uo1HIbYJ1qI/AAAAAAAAHBA/Vn6ja9fOKkc/s1600/dot1.png",
+          "size": ["16px", "16px"]
+        },
+        "base": "Particle"
+      },
+      "smoke": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside"  , "content": "viewport", "how": "die"}, 
+        {"behaviour": "randomFall"  , "a": [0, 0.4], "offset": [0, 0.1]},
+        {"behaviour": "resistance"  , "rho": [0.1, 0.1]},
+        {"behaviour": "randomWalker", "P": 0.8, "d": 2},
+        ],
+        "img": {
+          "src": "http://1.bp.blogspot.com/-ppY0TzCnsTU/UouvyveV9hI/AAAAAAAAG6Y/UcT0TfLsje8/s1600/polvo1.png",
+          "size": ["16px", "16px"]
+        },
+        "base": "Particle"
+      }
+    },
+    "instances": [
+    {"pos": "50px 100px"  , "DNA": "spaceInv1"},
+    {"pos": "950px 50px"	, "DNA": "spaceInv1"},
+    {"pos": "450px 70px"	, "DNA": "spaceInv2"},
+    {"pos": "150px 10px"	, "DNA": "spaceInv2"},
+    ],
+    "content": document.getElementById("header-inner"),
+    "limit": {"to": 15, "reach": "dontAdd"},
+    "fps": 20
+  };
+  var obg = OBG.create(example);
+  obg.start();
+  
+
+  //]]>
+</script>
+</body>
+</html>
