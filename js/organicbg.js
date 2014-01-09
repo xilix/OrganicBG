@@ -126,7 +126,6 @@ var OBG = (function (OBG) {
     return this.data[this.length - 1];
   };
   BaseBuffer.prototype.prepareKid = function (index) {
-console.log("preparing kid....");
     this.pregnants.push(index);
   };
   BaseBuffer.prototype.giveBirthToAll = function () {
@@ -134,7 +133,6 @@ console.log("preparing kid....");
 
     for(i = 0; i < N; i += 1) {
       this.add(this.pregnants[i], true);
-console.log("kid borned....");
     }
     this.pregnants = [];
   };
