@@ -10,7 +10,7 @@ Organic Background add's a background-image style attribute to the target HTML. 
 Usage
 =====
 
-<code>
+```javascript
 var obgAnim1 = OBG.create({
   "DNA": {
     "spaceInv1": {
@@ -46,7 +46,11 @@ var obgAnim1 = OBG.create({
 });
 
 obgAnim1.start();
-</code>
+```
+
+It's benn used
+===============
+http://www.pixelsmil.com
 
 Some behaviours:
 ===============
