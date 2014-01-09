@@ -34,7 +34,7 @@ Usage
 </div> 
 
 <!--
-  Okey. let's get on busniess. We import the library, actually if you
+  Okey. let's get on busniess. First import the library. Actually if you
   preffer you can copy & paste the JS code from the library as is not 
   as heavy
 -->
@@ -44,10 +44,8 @@ Usage
   Now it's time to set up the animation. Here it comes the hard stuff
 -->
 <script language='Javascript'>
-```
-```javascript
-// Here the a background animation is created
-var obgAnim1 = OBG.create({
+// The a background animation is created usng OBG.create()
+var obgAnim1 = OBG.create({// The input parameter is a json wich defines de animation
   "DNA": {// The "DNA" or class that will be used to respawn the particles
     "spaceInvader": { // We define the class of particle called sapceInvader
       "behaviours": [ // We sed how the particle wil behave
@@ -98,8 +96,6 @@ var obgAnim1 = OBG.create({
 });
 
 obgAnim1.start();// here the background animation begin
-```
-```html
 </script>
 <!--
   Now we have our awsome space invaders moving in the background of the
@@ -134,73 +130,73 @@ how: ["stop" | "bounce" | "die"]
 It randomly change the velocity of the particle. It require a probablity "P" on how often it happens. The probability it range from 0 (more probable) to 1 (sure it will happen). This proability is check every click. Also it need a maximum speed "v" which it will have the particle.
 
 v: [numeric]
-  An array for the x and y direccion. Maxmium random speed in any direccion
+An array for the x and y direccion. Maxmium random speed in any direccion
 P: [numeric]
-  Probability to change the direccion and the speed of the movment as (1-P)
+Probability to change the direccion and the speed of the movment as (1-P)
 
 **randomTeleport**
 
 It teleports the particle in a random position inside the viewportdd
 
 P: [numeric]
-  Probability to teleport in a random position inside the viewport as (1-P)
+Probability to teleport in a random position inside the viewport as (1-P)
 
 **brownianMovment**
 
 Browniand movment adds a random modification to the speed of a particle.
 
 v: [numeric]
-  An array for the x and y direccion. Maxmium random speed modification in any direccion
+An array for the x and y direccion. Maxmium random speed modification in any direccion
 P: [numeric]
-  Probability to add a random movment to the direccion and the speed of the movment as (1-P)
+Probability to add a random movment to the direccion and the speed of the movment as (1-P)
 
 **clone**
 
 It clones the particle making apear a new particle with the same DNA as the original one and in the same position
 
 P: [numeric]
-  Probability to be cloned as (1-P)
+Probability to be cloned as (1-P)
 
 **eject**
 
 Makes a new particle with a different DNA to apear in the same position of the particle which have this behaviour
 
 DNA: ["string"]
-  Identifing string for the DNA to apear
+Identifing string for the DNA to apear
 
 P: [numeric]
-  Probability to eject a particle with this DNA as (1-P)
+Probability to eject a particle with this DNA as (1-P)
 
 **die**
 
 It kills the particle
 
 P: [numeric]
-  Probability to kill the particle as (1-P)
+Probability to kill the particle as (1-P)
 
 **fall**
 
 Applies a constant acceleration to the particle
 
 a: [numeric numeric]
-  Array wich contains 2 numbers for the acceleration on the 2 directions.
+Array wich contains 2 numbers for the acceleration on the 2 directions.
 
 **randomFall**
 
 Applies a random acceleration to the particle
 
 a: [numeric numeric]
-  Array wich contains 2 numbers for the maximum random acceleration on the 2 directions.
+Array wich contains 2 numbers for the maximum random acceleration on the 2 directions.
 
 offset: [numeric numeric]
-  constant offset that would be applied to the random acceleration
+constant offset that would be applied to the random acceleration
 
 P: [numeric]
-  Probability to change the direction of the acceleration as (1-P)
+Probability to change the direction of the acceleration as (1-P)
 
 **resistance**
 
 Applies a multipicative modification to the speed. It comes fancy to simulate air resitance.
 
 rho: [numeric numeric]
-  speed resistance to every direccion (x and y). Recomendable to be between 1 and 0
+speed resistance to every direccion (x and y). Recomendable to be between 1 and 0
