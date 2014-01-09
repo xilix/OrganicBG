@@ -111,11 +111,11 @@ http://www.pixelsmil.com
 Some behaviours:
 ===============
 
-**Move behaviour**
+**move**
 
 Allows the particle to have any kind of movement
 
-**Keep inside behaviour**
+**keepInside**
 
 It keeps the particle inside an area. It requires an area to keep inside and a way to keep inside. viewport is the whole area of the background html element. bounce it tells that the particle will bounce in the edge. It may also be stop and update. update make the particle to update it's state till it fits inside the area.
 
