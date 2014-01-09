@@ -46,32 +46,32 @@ Usage
 <script language='Javascript'>
 // The a background animation is created usng OBG.create()
 var obgAnim1 = OBG.create({// The input parameter is a json wich defines de animation
-  "DNA": {// The "DNA" or class that will be used to respawn the particles
-    "spaceInvader": { // We define the class of particle called sapceInvader
-      "behaviours": [ // We sed how the particle wil behave
-        { // move behaviour it sets a velocity and the hability to move
+  "DNA": {// The "DNA"'s or class that will be used to respawn the particles
+    "spaceInvader": { // We define the class of a particle called sapceInvader
+      "behaviours": [ // We set how the particle wil behave
+        { // move behaviour it sets a velocity and the capabilty to move
           "behaviour": "move"
         },
         { // Is telling to keep the particle always inisde the limits of the
-          // DOM element and to do this in bounce once it reach an edge
+          // DOM element and in order to do this it bounce once it reach an edge
           "behaviour": "keepInside" ,
           "content": "viewport", 
           "how": "bounce"
         }, 
         {
-          // Every loop it will move at less than 3 pixels per loop in
+          // It will move less than 3 pixels per loop in
           // a random direction. The speed will randomly be changed 
-          // every loop with a probablilty of 1-P = 2%
+          // every loop with a probability of 1-P = 2%
           "behaviour": "randomMovment", 
           "P": 0.98, "v": 3
         }
       ],
       "img": {
-        // The image and size that will be shoed
+        // The image and size that will be showed
         "src": "img/inv1.png",
         "size": ["128px", "64px"]
       }
-      // The type of the particle. Right now there is only one.
+      // The type of the particle. Right now there is only one
       , "base": "Particle" 
     }
   },
@@ -88,9 +88,9 @@ var obgAnim1 = OBG.create({// The input parameter is a json wich defines de anim
   ],
   // The DOM content where the particles will be moving in the background
   "content": document.getElementById("header-inner"),
-  // Just to control the performance it says not to have more than 12
-  // particles running at one time. To do that once reach the limit it
-  // just forbid to add more
+  // Just to control the performance it tells not to have more than 12
+  // particles running at the same time. To do this once reach this limit it
+  // just forbid to add more particles
   "limit": {"to": 12, "reach": "dontAdd"},
   "fps": 30
 });
