@@ -128,11 +128,16 @@ It keeps the particle inside an area. It requires an area to keep inside and a w
 content: ["viewport" | object]
 viewport is to talk about the boundry of the DOM element. The particle with fetch inside of this area.
 If it's giving an object then it should have the syntaxy as follow:
+<code>
 {
-  shape: "square",// The particle will be keep inside an square are
-  size: [numeric, numeric], // Size of the square area (width and height)
-  pos: [numeric, numeric] // Position os the square area inside the DOM element (left and top)
-
+  // The particle will be keep inside an square are
+  shape: "square",
+  // Size of the square area (width and height)
+  size: [numeric, numeric], 
+  // Position os the square area inside the DOM element (left and top)
+  pos: [numeric, numeric] 
+}
+</code>
 how: ["stop" | "bounce" | "die"]
   
   stop: stops the particle and put it on the closed boundry of the DOM element
