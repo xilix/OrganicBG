@@ -13,6 +13,21 @@ var OBG = (function (OBG) {
 
   OBG.bases = [];
 
+  // "clone" an object
+  function cloneObj (obj) {
+    var copy = {};
+    if ("create" in Object) {// ECMA script 5 way
+      copy = Object.create(obj);
+    } else if (typeof JSON === "object") {// JSON way
+      copy = (JSON.parse(JSON.stringify(obj)));
+    } else {
+      // If not then prototyping. Yeah i know is not exactly to clone
+      // but is better than nothing
+      copy.prototype = obj; 
+    }
+    return copy;
+  }
+
   /**
    * Base class for partcile
    */
@@ -20,7 +35,6 @@ var OBG = (function (OBG) {
     var i = 0, Nbehaviours = 0 // For performance
     ,   behaviours = [];// behabiours clousures
 
-    this.v = [0, 0];// Velocity
     this.pos = lambda.pos;// Initial pos
     this.img = lambda.img;
     this.DNA = lambda;// for cloning
@@ -72,10 +86,16 @@ var OBG = (function (OBG) {
   };
 
   OBG.DNA = function (settings) {
-    this.settings = settings;
-
-    this.create = function (baseDNA, mutate) {
-      var DNA = this.settings.DNA[baseDNA], gen;
+    Object.defineProperty(this, "settings", {
+      "value": settings,
+      "writable": false,
+      "enumerable": true,
+      "configurable": false,
+    });
+    //this.settings = settings;
+    
+    this.mitosis = function (baseDNA, mutate) {
+      var DNA = cloneObj(this.settings.DNA[baseDNA]), gen;
 
       for (gen in mutate) {
         DNA[gen] = mutate[gen];
@@ -182,15 +202,18 @@ var OBG = (function (OBG) {
 
     this.mutagen = function (mutate) {
       var mutagen = {
-        "DNA": this.DNA,
-        "mutagen": this.mutagen,
+        "mitosis": this.DNA.mitosis.bind(this.DNA),
+        "mutagen": this.mutagen.bind(this),
         "W": parseInt(settings.content.style.width.split("px")[0]),
-        "H": parseInt(settings.content.style.height.split("px")[0])
+        "H": parseInt(settings.content.style.height.split("px")[0]),
+        "fps": settings.fps,
+        "dt": 1 / settings.fps
       }, gen;
 
       for (gen in mutate) {
         mutagen[gen] = mutate[gen];
       }
+
       return mutagen;
     };
 
@@ -214,34 +237,34 @@ var OBG = (function (OBG) {
     };
 
     function __construct(parent) {
-      var initPos = [], Nparticles, i;
+      var initPos = [], Nparticles, i, gen, gens = {};
       parent.DNA = new OBG.DNA(settings);
 
       Nparticles = settings.instances.length;
       for (i = 0; i < Nparticles; i++) {
-        initPos = [];
-        initPos[0] = parseInt(settings.instances[i].pos.split("px ")[0]);
-        initPos[1] = settings.instances[i].pos.split("px ")[1];
-        initPos[1] = parseInt(initPos[1].split("px ")[0]);
+        gens = {};
+        for (gen in settings.instances[i]) {
+          gens[gen] = settings.instances[i][gen];
+        }
+
+        gens["pos"] = [];
+        gens["pos"][0] = parseInt(settings.instances[i].pos.split("px ")[0]);
+        gens["pos"][1] = settings.instances[i].pos.split("px ")[1];
+        gens["pos"][1] = parseInt(gens["pos"][1].split("px ")[0]);
 
         parent.basesBuffer.add(
-          parent.DNA.create(
-            settings.instances[i].DNA 
-            , parent.mutagen({"pos": initPos})
-          )
+          parent.DNA.mitosis(settings.instances[i].DNA, parent.mutagen(gens))
           , true
         );
       }
     }
     __construct(this);
-
   }
 
   OrganicBG.prototype.setContent = function (value) {
     content = value;
     this.basesBuffer.clear();
   };
-
 
   OrganicBG.prototype.start = function () {
     var loop = this.loop, id;
@@ -260,16 +283,17 @@ var OBG = (function (OBG) {
     window.clearInterval(this.animId);
   };
 
-
   OBG.create = function (settings) {
     return new OrganicBG(settings);
   }
+
   OBG.start = function (settings) {
     quickLaunch = new OrganicBG(settings);
     quickLaunch.start();
 
     return quickLaunch;
   };
+
   OBG.stop = function (settings) {
     if (quickLaunch !== null) { quickLaunch.stop(); }
 
@@ -287,13 +311,38 @@ OBG = (function (OBG) {
   OBG.assemblers["keepInside"] = function (particle, behaviour, lambda) {
     var limits = [999, 999], how = function () { };
 
-    behaviour.W = lambda.W;
-    behaviour.H = lambda.H;
+    if (typeof behaviour.content === "string") {
+      switch (behaviour.content) {
+        case "viewport":
+          behaviour.W = lambda.W;
+          behaviour.H = lambda.H;
+          behaviour.offX = 0;
+          behaviour.offY = 0;
 
-    if (behaviour.content === "viewport") {
-      limits = [behaviour.W, behaviour.H];
-      limits[0] -= particle.size[0];
-      limits[1] -= particle.size[1];
+          limits = [
+            [behaviour.offX, behaviour.offY]
+            , [behaviour.W + behaviour.offX , behaviour.H + behaviour.offY]
+          ];
+          limits[1][0] -= particle.size[0];
+          limits[1][1] -= particle.size[1];
+          break;
+      }
+    } else {
+      switch (behaviour.content.shape) {
+        case "square":
+          behaviour.W = behaviour.content.size[0];
+          behaviour.H = behaviour.content.size[1];
+          behaviour.offX = behaviour.content.pos[0];
+          behaviour.offY = behaviour.content.pos[1];
+
+          limits = [
+            [behaviour.offX, behaviour.offY]
+            , [behaviour.W + behaviour.offX, behaviour.H + behaviour.offY]
+          ];
+          limits[1][0] -= particle.size[0];
+          limits[1][1] -= particle.size[1];
+          break;
+      }
     }
 
     switch (behaviour.how) {
@@ -325,10 +374,18 @@ OBG = (function (OBG) {
 
     particle.addBehaviour(function () {
       var isInside = true, limit = {"pos": particle.pos, "hit": [false, false]};
-      if (particle.pos[0] > limits[0])  { limit.pos[0] = limits[0]; limit.hit[0] = true; isInside = false; }
-      if (particle.pos[1] > limits[1])  { limit.pos[1] = limits[1]; limit.hit[1] = true; isInside = false; }
-      if (particle.pos[0] < 0)          { limit.pos[0] = 0;         limit.hit[0] = true; isInside = false; }
-      if (particle.pos[1] < 0)          { limit.pos[1] = 0;         limit.hit[1] = true; isInside = false; }
+      if (particle.pos[0] > limits[1][0]) { 
+        limit.pos[0] = limits[1][0]; limit.hit[0] = true; isInside = false; 
+      }
+      if (particle.pos[1] > limits[1][1]) { 
+        limit.pos[1] = limits[1][1]; limit.hit[1] = true; isInside = false; 
+      }
+      if (particle.pos[0] < limits[0][0]) { 
+        limit.pos[0] = limits[0][0]; limit.hit[0] = true; isInside = false; 
+      }
+      if (particle.pos[1] < limits[0][1]) { 
+        limit.pos[1] = limits[0][1]; limit.hit[1] = true; isInside = false; 
+      }
 
       if (!isInside) {
         how(limit);
@@ -338,6 +395,16 @@ OBG = (function (OBG) {
     return particle;
   };
   OBG.assemblers["move"] = function (particle, behaviour, lambda) {
+    particle.v = [0, 0];
+    if (behaviour.v !== undefined) {
+      particle.v[0] = behaviour.v[0];
+      particle.v[1] = behaviour.v[1];
+    }
+    if (particle.DNA.v !== undefined) {
+      particle.v[0] = particle.DNA.v[0];
+      particle.v[1] = particle.DNA.v[1];
+    }
+
     particle.addBehaviour(function (){
       particle.pos[0] += particle.v[0];
       particle.pos[1] += particle.v[1];
@@ -345,8 +412,9 @@ OBG = (function (OBG) {
     return particle;
   };
   OBG.assemblers["randomMovment"] = function (particle, behaviour, lambda) {
+    var P = (1 - behaviour.P / lambda.fps);
     particle.addBehaviour(function (){
-      if (Math.random() > behaviour.P) {
+      if (Math.random() > P) {
         particle.v = [
           Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2)), 
           Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2))
@@ -356,8 +424,9 @@ OBG = (function (OBG) {
     return particle;
   };
   OBG.assemblers["randomTeleport"] = function (particle, behaviour, lambda) {
+    var P = (1 - behaviour.P / lambda.fps);
     particle.addBehaviour(function (){
-      if (Math.random() > behaviour.P) {
+      if (Math.random() > P) {
         particle.pos = [
           Math.round(lambda.W * Math.random()), 
           Math.round(lambda.H * Math.random()) 
@@ -367,8 +436,9 @@ OBG = (function (OBG) {
     return particle;
   };
   OBG.assemblers["brownianMovment"] = function (particle, behaviour, lambda) {
+    var P = (1 - behaviour.P / lambda.fps);
     particle.addBehaviour(function(){
-      if (Math.random() > behaviour.P) {
+      if (Math.random() > P) {
         particle.v = [
           particle.v[0] + Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2)), 
           particle.v[1] + Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2))
@@ -378,8 +448,9 @@ OBG = (function (OBG) {
     return particle;
   };
   OBG.assemblers["randomWalker"] = function (particle, behaviour, lambda) {
+    var P = (1 - behaviour.P / lambda.fps);
     particle.addBehaviour(function(){
-      if (Math.random() > behaviour.P) {
+      if (Math.random() > P) {
         particle.pos = [
           particle.pos[0] + Math.round(behaviour.d * Math.random() * (1 - Math.random() * 2)), 
           particle.pos[1] + Math.round(behaviour.d * Math.random() * (1 - Math.random() * 2))
@@ -389,17 +460,19 @@ OBG = (function (OBG) {
     return particle;
   };
   OBG.assemblers["clone"] = function (particle, behaviour, lambda) {
+    var P = (1 - behaviour.P / lambda.fps);
     particle.addBehaviour(function(){
-      if (Math.random() > behaviour.P) {
+      if (Math.random() > P) {
         lambda.basesBuffer.prepareKid(particle.DNA);
       }
     });
     return particle;
   };
   OBG.assemblers["eject"] = function (particle, behaviour, lambda) {
+    var P = (1 - behaviour.P / lambda.fps);
     particle.addBehaviour(function(){
-      if (Math.random() > behaviour.P) {
-        lambda.basesBuffer.prepareKid(lambda.DNA.create(
+      if (Math.random() > P) {
+        lambda.basesBuffer.prepareKid(lambda.mitosis(
           behaviour["DNA"], 
           lambda.mutagen({
             "pos":[
@@ -412,8 +485,9 @@ OBG = (function (OBG) {
     return particle;
   };
   OBG.assemblers["die"] = function (particle, behaviour, lambda) {
+    var P = (1 - (1 - behaviour.P) / lambda.fps);
     particle.addBehaviour(function(){
-      if (Math.random() > behaviour.P) {
+      if (Math.random() > P) {
         lambda.basesBuffer.deathMark(particle.index);
       }
     });
@@ -440,13 +514,6 @@ OBG = (function (OBG) {
     });
     return particle;
   };
-  OBG.assemblers["friction"] = function (particle, behaviour, lambda) {
-    particle.addBehaviour(function(){
-      particle.v[0] *= behaviour.rho[1];
-      particle.v[1] *= behaviour.rho[0];
-    });
-    return particle;
-  };
  
   OBG.assemblers["dummy"] = function (particle, behaviour, lambda) {
 
@@ -459,5 +526,5 @@ OBG = (function (OBG) {
 
 // Support CommonJS require()
 if (typeof module !== "undefined" && ('exports' in module)) { 
-  module.exports = OBG;
+  module.exports = exports = OBG;
 }

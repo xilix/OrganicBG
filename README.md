@@ -60,10 +60,11 @@ var obgAnim1 = OBG.create({// The input parameter is a json wich defines de anim
         }, 
         {
           // It will move less than 3 pixels per loop in
-          // a random direction. The speed will randomly be changed 
-          // every loop with a probability of 1-P = 2%
+          // a random direction. The speed will randomly be changed
+          // throug time. The probablitiy that his happens at least
+          // once in 1 second is P
           "behaviour": "randomMovment", 
-          "P": 0.98, "v": 3
+          "P": 0.8, "v": 3
         }
       ],
       "img": {
@@ -79,7 +80,8 @@ var obgAnim1 = OBG.create({// The input parameter is a json wich defines de anim
   "instances": [
     {// The instance of a space invader
       "pos": "50px 10px",
-      "DNA": "spaceInvader"
+      "DNA": "spaceInvader",
+      "v": [2, 1]// You can set the initial speed here. by default is 0
     },
     {// The instance of another space invader
       "pos": "150px 50px",
@@ -115,12 +117,21 @@ Some behaviours:
 
 Allows the particle to have any kind of movement
 
+v: [numeric, numeric]
+The default inital speed of all particles of this class. If later for a particular particle a diferent speed is defined in the instance then the value of the instances is taked. By default is 0
+
+
 **keepInside**
 
 It keeps the particle inside an area. It requires an area to keep inside and a way to keep inside. viewport is the whole area of the background html element. bounce it tells that the particle will bounce in the edge. It may also be stop and update. update make the particle to update it's state till it fits inside the area.
 
-content: ["viewport"]
+content: ["viewport" | object]
 viewport is to talk about the boundry of the DOM element. The particle with fetch inside of this area.
+If it's giving an object then it should have the syntaxy as follow:
+{
+  shape: "square",// The particle will be keep inside an square are
+  size: [numeric, numeric], // Size of the square area (width and height)
+  pos: [numeric, numeric] // Position os the square area inside the DOM element (left and top)
 
 how: ["stop" | "bounce" | "die"]
   
@@ -138,14 +149,14 @@ v: [numeric]
 An array for the x and y direccion. Maxmium random speed in any direccion
 
 P: [numeric]
-Probability to change the direccion and the speed of the movment as (1-P)
+Probability to change the direccion and the speed of the movment at least once in 1 second
 
 **randomTeleport**
 
 It teleports the particle in a random position inside the viewportdd
 
 P: [numeric]
-Probability to teleport in a random position inside the viewport as (1-P)
+Probability to teleport in a random position inside the viewport at least once in 1 second
 
 **brownianMovment**
 
@@ -155,14 +166,14 @@ v: [numeric]
 An array for the x and y direccion. Maxmium random speed modification in any direccion
 
 P: [numeric]
-Probability to add a random movment to the direccion and the speed of the movment as (1-P)
+Probability to add a random movment to the direccion and the speed of the movment at least once in 1 second
 
 **clone**
 
 It clones the particle making apear a new particle with the same DNA as the original one and in the same position
 
 P: [numeric]
-Probability to be cloned as (1-P)
+Probability to be cloned at least once in 1 second
 
 **eject**
 
@@ -172,14 +183,14 @@ DNA: ["string"]
 Identifing string for the DNA to apear
 
 P: [numeric]
-Probability to eject a particle with this DNA as (1-P)
+Probability to eject a particle with this DNA at least once in 1 second
 
 **die**
 
 It kills the particle
 
 P: [numeric]
-Probability to kill the particle as (1-P)
+Probability to kill the particle at least once in 1 second
 
 **fall**
 
@@ -199,7 +210,7 @@ offset: [numeric numeric]
 constant offset that would be applied to the random acceleration
 
 P: [numeric]
-Probability to change the direction of the acceleration as (1-P)
+Probability to change the direction of the acceleration at least once in 1 second
 
 **resistance**
 
