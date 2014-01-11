@@ -17,9 +17,9 @@
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside"    , "content": "viewport", "how": "update"}, 
-        {"behaviour": "randomMovment", "P": 0.98, "v": 2},
-        {"behaviour": "randomTeleport", "P": 0.995},
-        {"behaviour": "eject"        , "P": 0.995, "DNA": "spark1"}
+        {"behaviour": "randomMovment", "P": 0.8, "v": 2},
+        {"behaviour": "randomTeleport", "P": 0.1},
+        {"behaviour": "eject"        , "P": 0.2, "DNA": "spark1"}
         ],
         "img": {
           "src": "http://2.bp.blogspot.com/-7MBIdqphISg/Uo0ab_jf10I/AAAAAAAAG-4/-1aMrnQ5eSY/s1600/inv1.png",
@@ -31,9 +31,9 @@
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside", "content": "viewport", "how": "update"}, 
-        {"behaviour": "randomMovment", "P": 0.95, "v": 3},
-        {"behaviour": "randomTeleport", "P": 0.998}, 
-        {"behaviour": "eject"        , "P": 0.995, "DNA": "spark2"}
+        {"behaviour": "randomMovment", "P": 0.8, "v": 3},
+        {"behaviour": "randomTeleport", "P": 0.05}, 
+        {"behaviour": "eject"        , "P": 0.4, "DNA": "spark2"}
         ],
         "img": {
           "src": "http://1.bp.blogspot.com/-L5UUPVb63aw/Uo0ab3bNoGI/AAAAAAAAG_Q/HpfID1_iq6M/s1600/inv2.png",
@@ -45,8 +45,8 @@
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside", "content": "viewport", "how": "bounce"}, 
-        {"behaviour": "randomMovment", "P": 0.95, "v": 4},
-        {"behaviour": "eject"        , "P": 0.995, "DNA": "spark3"}
+        {"behaviour": "randomMovment", "P": 0.9, "v": 4},
+        {"behaviour": "eject"        , "P": 0.6, "DNA": "spark3"}
         ],
         "img": {
           "src": "http://2.bp.blogspot.com/-U7ml0yJf7A4/Uo0ab5YhI0I/AAAAAAAAG-8/wAu8EDHx_QQ/s1600/inv3.png",
@@ -58,8 +58,8 @@
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside", "content": "viewport", "how": "bounce"}, 
-        {"behaviour": "randomMovment", "P": 0.93, "v": 5},
-        {"behaviour": "eject"        , "P": 0.995, "DNA": "spark4"}
+        {"behaviour": "randomMovment", "P": 0.95, "v": 5},
+        {"behaviour": "eject"        , "P": 0.8, "DNA": "spark4"}
         ],
         "img": {
           "src": "http://1.bp.blogspot.com/-sV8jc20lST0/Uo0acKf_QfI/AAAAAAAAG_A/bwpzPiEaA-s/s1600/inv4.png",
@@ -71,7 +71,7 @@
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside"      , "content": "viewport", "how": "stop"}, 
-        {"behaviour": "die"             , "P": 0.999}
+        {"behaviour": "die"             , "P": 0.01}
         ],
         "img": {
           "src": "http://1.bp.blogspot.com/-Z0vWxEHTg6w/Uo1HIbYJ1qI/AAAAAAAAHBA/Vn6ja9fOKkc/s1600/dot1.png",
@@ -83,7 +83,7 @@
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside"      , "content": "viewport", "how": "stop"}, 
-        {"behaviour": "die"             , "P": 0.999}
+        {"behaviour": "die"             , "P": 0.1}
         ],
         "img": {
           "src": "http://1.bp.blogspot.com/-r5ImJdKKw9E/Uo1HIUdmR3I/AAAAAAAAHBE/dvZW8BpA8Kk/s1600/dot2.png",
@@ -95,7 +95,7 @@
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside"      , "content": "viewport", "how": "stop"}, 
-        {"behaviour": "die"             , "P": 0.999}
+        {"behaviour": "die"             , "P": 0.15}
         ],
         "img": {
           "src": "http://1.bp.blogspot.com/-iqxePNxt2Tw/Uo1HIVYjIdI/AAAAAAAAHBI/bvH9a8Og2W8/s1600/dot3.png",
@@ -107,7 +107,7 @@
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside"      , "content": "viewport", "how": "stop"}, 
-        {"behaviour": "die"             , "P": 0.999}
+        {"behaviour": "die"             , "P": 0.2}
         ],
         "img": {
           "src": "http://1.bp.blogspot.com/-iM9V9EV4iq4/Uo1HIzuEZeI/AAAAAAAAHBU/3CBX9pcpxC0/s1600/dot4.png",
@@ -127,7 +127,7 @@
     {"pos": "650px 150px"	, "DNA": "spaceInv4"}	
     ],
     "content": document.getElementById("header-inner"),
-    "limit": {"to": 20, "reach": "dontAdd"},
+    "limit": {"to": 30, "reach": "dontAdd"},
     "fps": 30
   };
   var obg = OBG.create(example);

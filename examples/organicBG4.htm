@@ -5,7 +5,7 @@
     <script type="text/javascript" src="../js/organicbg.js"></script>
   </head> 
   <body style="text-align:center">
-<div id="header-inner" style="border: 2px #000 solid; width:1020px;height:400px; margin: auto; margin-top: 30px;background-repeat: no-repeat;">
+<div id="outer-content" style="border: 2px #000 solid; width:1020px;height:400px; margin: auto; margin-top: 30px;background-repeat: no-repeat;">
 </div> 
 <script language='Javascript'>
   //<![CDATA[
@@ -14,15 +14,21 @@
     "DNA": {
       "spaceInv1": {
         "behaviours": [
-        {"behaviour": "move"},
-        {"behaviour": "keepInside"    , "content": "viewport", "how": "bounce"}, 
-        {"behaviour": "randomMovment", "P": 0.8, "v": 2},
-        {"behaviour": "randomTeleport", "P": 0.1}
-        , {"behaviour": "eject"        , "P": 0.2, "DNA": "smoke"}
+          {"behaviour": "move", "v": [1, 2]},
+          {
+            "behaviour": "keepInside",
+            "content": {
+              "shape": "square", 
+              "size": [200, 200], 
+              "pos": [300, 50]
+            },
+            "how": "bounce"
+          }, 
+          {"behaviour": "eject", "P": 0.6, "DNA": "spark"}
         ],
         "img": {
-          "src": "http://2.bp.blogspot.com/-7MBIdqphISg/Uo0ab_jf10I/AAAAAAAAG-4/-1aMrnQ5eSY/s1600/inv1.png",
-          "size": ["64px", "36px"]
+          "src": "http://1.bp.blogspot.com/-sV8jc20lST0/Uo0acKf_QfI/AAAAAAAAG_A/bwpzPiEaA-s/s1600/inv4.png",
+          "size": ["52px", "34px"]
         },
         "base": "Particle"
       },
@@ -30,12 +36,12 @@
         "behaviours": [
         {"behaviour": "move"},
         {"behaviour": "keepInside", "content": "viewport", "how": "bounce"}, 
-        {"behaviour": "randomMovment", "P": 0.9, "v": 5}
-        , {"behaviour": "eject"        , "P": 0.4, "DNA": "spark"}
+        {"behaviour": "randomMovment", "P": 0.7, "v": 5}
+        , {"behaviour": "eject"        , "P": 0.2, "DNA": "smoke"}
         ],
         "img": {
-          "src": "http://1.bp.blogspot.com/-sV8jc20lST0/Uo0acKf_QfI/AAAAAAAAG_A/bwpzPiEaA-s/s1600/inv4.png",
-          "size": ["52px", "34px"]
+          "src": "http://2.bp.blogspot.com/-7MBIdqphISg/Uo0ab_jf10I/AAAAAAAAG-4/-1aMrnQ5eSY/s1600/inv1.png",
+          "size": ["64px", "36px"]
         },
         "base": "Particle"
       },
@@ -57,7 +63,7 @@
         {"behaviour": "keepInside"  , "content": "viewport", "how": "die"}, 
         {"behaviour": "randomFall"  , "a": [0, 0.4], "offset": [0, 0.1]},
         {"behaviour": "resistance"  , "rho": [0.1, 0.1]},
-        {"behaviour": "randomWalker", "P": 0.8, "d": 2},
+        {"behaviour": "randomWalker", "P": 0.95, "d": 3},
         ],
         "img": {
           "src": "http://1.bp.blogspot.com/-ppY0TzCnsTU/UouvyveV9hI/AAAAAAAAG6Y/UcT0TfLsje8/s1600/polvo1.png",
@@ -67,13 +73,13 @@
       }
     },
     "instances": [
-    {"pos": "50px 100px"  , "DNA": "spaceInv1"},
-    {"pos": "950px 50px"	, "DNA": "spaceInv1"},
-    {"pos": "450px 70px"	, "DNA": "spaceInv2"},
-    {"pos": "150px 10px"	, "DNA": "spaceInv2"},
+      {"pos": "250px 100px" , "DNA": "spaceInv1", "v": [3, 1]},
+      {"pos": "350px 150px"	, "DNA": "spaceInv1"},
+      {"pos": "450px 70px"	, "DNA": "spaceInv2"},
+      {"pos": "150px 10px"	, "DNA": "spaceInv2"},
     ],
-    "content": document.getElementById("header-inner"),
-    "limit": {"to": 15, "reach": "dontAdd"},
+    "content": document.getElementById("outer-content"),
+    "limit": {"to": 35, "reach": "dontAdd"},
     "fps": 20
   };
   var obg = OBG.create(example);
