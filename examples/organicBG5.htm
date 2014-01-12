@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> Organic Backgrounds </title>
+    <script type="text/javascript" src="../js/organicbg.js"></script>
+  </head> 
+  <body style="text-align:center">
+<div id="header-inner" style="border: 2px #000 solid; width:1020px;height:400px; margin: auto; margin-top: 30px;background-repeat: no-repeat;">
+</div> 
+<script language='Javascript'>
+  //<![CDATA[
+
+  var example = {
+    "DNA": {
+     "spaceInv": {
+        "behaviours": [
+          {"behaviour": "magnet", "F": 300, "pos": [400, 200]},
+          {"behaviour": "eject"   , "T": 0.5, "DNA": "spark"},
+          {"behaviour": "move"},
+        ],
+        "img": {
+          "src": "../img/inv4.png",
+          "size": ["20px", "16px"]
+        },
+        "base": "Particle"
+      },
+      "spark": {
+        "behaviours": [
+        {"behaviour": "move"},
+        {"behaviour": "keepInside"      , "content": "viewport", "how": "die"}, 
+        {"behaviour": "die"  , "T": 1},
+        ],
+        "img": {
+          "src": "../img/dot1.png",
+          "size": ["16px", "16px"]
+        },
+        "base": "Particle"
+      },
+      "atom": {
+        "behaviours": [
+        ],
+        "img": {
+          "src": "../img/atom.png",
+          "size": ["22px", "22px"]
+        },
+        "base": "Particle"
+      },
+
+    },
+    "instances": [
+    {"pos": "400px 150px"  , "DNA": "spaceInv", "v": [-2.5, 0]},
+    {"pos": "500px 200px"  , "DNA": "spaceInv", "v": [-0.5, 1]},
+    {"pos": "390px 275px"	 , "DNA": "spaceInv", "v": [0.7, 0]},
+    {"pos": "400px 200px"  , "DNA": "atom"},
+    {"pos": "400px 250px"	 , "DNA": "spaceInv", "v": [2.5, 0]},
+    ],
+    "content": document.getElementById("header-inner"),
+    "limit": {"to": 15, "reach": "dontAdd"},
+    "fps": 20
+  };
+  var obg = OBG.create(example);
+  obg.start();
+  
+
+  //]]>
+</script>
+</body>
+</html>
