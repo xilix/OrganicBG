@@ -53,7 +53,7 @@ var OBG = (function (OBG) {
     this.update = function () { 
       var i;
       for (i = 0; i < Nbehaviours; i++) {
-        behaviours[i]();
+        if (!behaviours[i]()) { break; };
       }
     };
     this.getPos = function () {
@@ -390,7 +390,7 @@ OBG = (function (OBG) {
       if (!isInside) {
         how(limit);
       }
-
+      return true;
     });
     return particle;
   };
@@ -408,70 +408,87 @@ OBG = (function (OBG) {
     particle.addBehaviour(function (){
       particle.pos[0] += particle.v[0];
       particle.pos[1] += particle.v[1];
+      return true;
     });
     return particle;
   };
   OBG.assemblers["randomMovment"] = function (particle, behaviour, lambda) {
-    var P = (1 - behaviour.P / lambda.fps);
+    var P = (1 - behaviour.P / lambda.fps), T = behaviour.T, 
+        dt = lambda.dt, t = dt;
     particle.addBehaviour(function (){
-      if (Math.random() > P) {
+      if (t < dt || Math.random() > P) {
         particle.v = [
           Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2)), 
           Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2))
         ];
       }
+      if (T) { t += dt; t = t % T; }
+      return true;
     });
     return particle;
   };
   OBG.assemblers["randomTeleport"] = function (particle, behaviour, lambda) {
-    var P = (1 - behaviour.P / lambda.fps);
+    var P = (1 - behaviour.P / lambda.fps), T = behaviour.T, 
+        dt = lambda.dt, t = dt;
     particle.addBehaviour(function (){
-      if (Math.random() > P) {
+      if (t < dt || Math.random() > P) {
         particle.pos = [
           Math.round(lambda.W * Math.random()), 
           Math.round(lambda.H * Math.random()) 
         ];
       }
+      if (T) { t += dt; t = t % T; }
+      return true;
     });
     return particle;
   };
   OBG.assemblers["brownianMovment"] = function (particle, behaviour, lambda) {
-    var P = (1 - behaviour.P / lambda.fps);
+    var P = (1 - behaviour.P / lambda.fps), T = behaviour.T, 
+        dt = lambda.dt, t = dt;
     particle.addBehaviour(function(){
-      if (Math.random() > P) {
+      if (t < dt || Math.random() > P) {
         particle.v = [
           particle.v[0] + Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2)), 
           particle.v[1] + Math.round(behaviour.v * Math.random() * (1 - Math.random() * 2))
         ];
       }
+      if (T) { t += dt; t = t % T; }
+      return true;
     });
     return particle;
   };
   OBG.assemblers["randomWalker"] = function (particle, behaviour, lambda) {
-    var P = (1 - behaviour.P / lambda.fps);
+    var P = (1 - behaviour.P / lambda.fps), T = behaviour.T, 
+        dt = lambda.dt, t = dt;
     particle.addBehaviour(function(){
-      if (Math.random() > P) {
+      if (t < dt || Math.random() > P) {
         particle.pos = [
           particle.pos[0] + Math.round(behaviour.d * Math.random() * (1 - Math.random() * 2)), 
           particle.pos[1] + Math.round(behaviour.d * Math.random() * (1 - Math.random() * 2))
         ];
       }
+      if (T) { t += dt; t = t % T; }
+      return true;
     });
     return particle;
   };
   OBG.assemblers["clone"] = function (particle, behaviour, lambda) {
-    var P = (1 - behaviour.P / lambda.fps);
+    var P = (1 - behaviour.P / lambda.fps), T = behaviour.T, 
+        dt = lambda.dt, t = dt;
     particle.addBehaviour(function(){
-      if (Math.random() > P) {
+      if (t < dt || Math.random() > P) {
         lambda.basesBuffer.prepareKid(particle.DNA);
       }
+      if (T) { t += dt; t = t % T; }
+      return true;
     });
     return particle;
   };
   OBG.assemblers["eject"] = function (particle, behaviour, lambda) {
-    var P = (1 - behaviour.P / lambda.fps);
+    var P = (1 - behaviour.P / lambda.fps), T = behaviour.T, 
+        dt = lambda.dt, t = dt;
     particle.addBehaviour(function(){
-      if (Math.random() > P) {
+      if (t < dt || Math.random() > P) {
         lambda.basesBuffer.prepareKid(lambda.mitosis(
           behaviour["DNA"], 
           lambda.mutagen({
@@ -481,15 +498,20 @@ OBG = (function (OBG) {
           ]})
         ));
       }
+      if (T) { t += dt; t = t % T; }
+      return true;
     });
     return particle;
   };
   OBG.assemblers["die"] = function (particle, behaviour, lambda) {
-    var P = (1 - (1 - behaviour.P) / lambda.fps);
+    var P = (1 - behaviour.P / lambda.fps), T = behaviour.T, 
+        dt = lambda.dt, t = dt;
     particle.addBehaviour(function(){
-      if (Math.random() > P) {
+      if (t < dt || Math.random() > P) {
         lambda.basesBuffer.deathMark(particle.index);
       }
+      if (T) { t += dt; t = t % T; }
+      return true;
     });
     return particle;
   };
@@ -497,13 +519,20 @@ OBG = (function (OBG) {
     particle.addBehaviour(function(){
       particle.v[0] += behaviour.a[0];
       particle.v[1] += behaviour.a[1];
+      return true;
     });
     return particle;
   };
   OBG.assemblers["randomFall"] = function (particle, behaviour, lambda) {
+    var P = (1 - behaviour.P / lambda.fps), T = behaviour.T, 
+        dt = lambda.dt, t = dt;
     particle.addBehaviour(function(){
-      particle.v[0] += Math.random() * behaviour.a[0] - behaviour.offset[0];
-      particle.v[1] += Math.random() * behaviour.a[1] - behaviour.offset[1];
+      if (t < dt || Math.random() > P) {
+        particle.v[0] += Math.random() * behaviour.a[0] - behaviour.offset[0];
+        particle.v[1] += Math.random() * behaviour.a[1] - behaviour.offset[1];
+      }
+      if (T) { t += dt; t = t % T; }
+      return true;
     });
     return particle;
   };
@@ -511,6 +540,80 @@ OBG = (function (OBG) {
     particle.addBehaviour(function(){
       particle.v[0] *= (1 - behaviour.rho[0]);
       particle.v[1] *= (1 - behaviour.rho[1]);
+      return true;
+    });
+    return particle;
+  };
+  OBG.assemblers["magnet"] = function (particle, behaviour, lambda) {
+    var F = [0, 0];
+    if (typeof behaviour.F !== "object") {
+      F = [behaviour.F, behaviour.F];
+    } else {
+      F = [behaviour.F[0], behaviour.F[1]];
+    }
+    function sign(value){
+      if (value > 0) { return 1; }
+      return (value < 0 ? -1 : 0);
+    }
+
+    particle.addBehaviour(function(){
+      var d = [
+        particle.pos[0] - behaviour.pos[0],
+        particle.pos[1] - behaviour.pos[1]
+      ], d2, dd = [0, 0], dv = [0, 0];
+
+      d2 = d[0] * d[0] + d[1] * d[1]; 
+      if (d2 > 1) { 
+        if (d[0] < -1 || d[0] > 1) { 
+          dv[0] = -(F[0] * (d[0] / Math.sqrt(d2)) / d2);
+        }
+        if (d[1] < -1 || d[1] > 1) { 
+          dv[1] = -(F[1] * (d[1] / Math.sqrt(d2)) / d2);
+        }
+      } else {
+        particle.v = [0, 0];
+        return true;
+      }
+
+      if (
+        sign(particle.pos[0] + particle.v[0] + dv[0] - behaviour.pos[0]) 
+        != sign(d[0])
+        && sign(particle.pos[1] + particle.v[1] + dv[1] - behaviour.pos[1]) 
+        != sign(d[1])
+      ) {
+        particle.pos[0] = behaviour.pos[0] - d[0];
+        particle.pos[1] = behaviour.pos[1] - d[1];
+        return true;
+      }
+
+
+      particle.v[0] += dv[0];
+      particle.v[1] += dv[1];
+      return true;
+    });
+    return particle;
+  };
+  OBG.assemblers["atractor"] = function (particle, behaviour, lambda) {
+    var F = [0, 0];
+    if (typeof behaviour.F !== "object") {
+      F = [behaviour.F, behaviour.F];
+    } else {
+      F = [behaviour.F[0], behaviour.F[1]];
+    }
+
+    particle.addBehaviour(function(){
+      var d = [0, 0];
+      d = [
+        (particle.pos[0] - behaviour.pos[0] < 0 ? -1 : d[0]),
+        (particle.pos[1] - behaviour.pos[1] < 0 ? -1 : d[1])
+      ];
+      d = [
+        (particle.pos[0] - behaviour.pos[0] > 0 ? 1 : d[0]),
+        (particle.pos[1] - behaviour.pos[1] > 0 ? 1 : d[1])
+      ];
+      particle.v[0] -= F[0] * d[0];
+      particle.v[1] -= F[1] * d[1];
+      return true;
     });
     return particle;
   };
