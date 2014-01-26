@@ -39,7 +39,7 @@ Usage
   as heavy
 -->
 <script type="text/javascript" src="js/organicbg.js"></script>
-
+<script type="text/javascript" src="js/obg.behaviours.js"></script>
 <!--
   Now it's time to set up the animation. Here it comes the hard stuff
 -->
