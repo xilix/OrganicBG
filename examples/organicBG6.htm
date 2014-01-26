@@ -15,7 +15,13 @@
     "DNA": {
      "spaceInv": {
         "behaviours": [
-          {"behaviour": "magnet", "F": 300, "pos": [400, 200]},
+          //{"behaviour": "keepInside"      , "content": "viewport", "how": "bounce"}, 
+          {"behaviour": "magnet", "F": 50, "pos": [200, 100]},
+          {"behaviour": "magnet", "F": 80, "pos": [400, 100]},
+          {"behaviour": "magnet", "F": 30, "pos": [600, 100]},
+          {"behaviour": "magnet", "F": 70, "pos": [200, 200]},
+          {"behaviour": "magnet", "F": 50, "pos": [400, 200]},
+          {"behaviour": "magnet", "F": 50, "pos": [600, 200]},
           {"behaviour": "eject"   , "T": 0.5, "DNA": "spark"},
           {"behaviour": "move"},
         ],
@@ -49,11 +55,19 @@
 
     },
     "instances": [
-    {"pos": "400px 150px"  , "DNA": "spaceInv", "v": [-2.5, 0]},
-    {"pos": "500px 200px"  , "DNA": "spaceInv", "v": [-0.5, 1]},
-    {"pos": "390px 275px"	 , "DNA": "spaceInv", "v": [0.7, 0]},
+    {"pos": "400px 150px"  , "DNA": "spaceInv", "v": [-2.5, 1]},
+    {"pos": "500px 450px"  , "DNA": "spaceInv", "v": [-0.5, 2]},
+    {"pos": "40px 50px"    , "DNA": "spaceInv", "v": [2, 0.8]},
+    {"pos": "150px 250px"  , "DNA": "spaceInv", "v": [-2.5, 1]},
+    {"pos": "150px 250px"  , "DNA": "spaceInv", "v": [-1.5, 0.8]},
+    {"pos": "250px 250px"  , "DNA": "spaceInv", "v": [-1.5, 1]},
+    {"pos": "150px 256px"  , "DNA": "spaceInv", "v": [-2, 0.5]},
+    {"pos": "200px 100px"  , "DNA": "atom"},
+    {"pos": "400px 100px"  , "DNA": "atom"},
+    {"pos": "600px 100px"  , "DNA": "atom"},
+    {"pos": "200px 200px"  , "DNA": "atom"},
     {"pos": "400px 200px"  , "DNA": "atom"},
-    {"pos": "400px 250px"	 , "DNA": "spaceInv", "v": [2.5, 0]},
+    {"pos": "600px 200px"  , "DNA": "atom"},
     ],
     "content": document.getElementById("header-inner"),
     "limit": {"to": 15, "reach": "dontAdd"},
