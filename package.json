@@ -1,0 +1,33 @@
+{
+  "name": "organic-background",
+  "version": "1.0.0",
+  "description": "OrganicBG =========",
+  "main": "./dist/index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "build": "npm run build:umd && npm run build:module",
+    "build:umd": "cross-env UMD=true webpack --config webpack.config.js --mode production",
+    "build:module": "webpack --config webpack.config.js --mode development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xilix/OrganicBG.git"
+  },
+  "keywords": [
+    "background",
+    "particles"
+  ],
+  "author": "xilix (https://github.com/xilix)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xilix/OrganicBG/issues"
+  },
+  "homepage": "https://github.com/xilix/OrganicBG#readme",
+  "devDependencies": {
+    "webpack": "^4.16.0",
+    "webpack-cli": "^3.0.8"
+  }
+}
